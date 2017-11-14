@@ -1,11 +1,12 @@
-from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 
+from backends.pools.querysets import QuerySetsPool
+from backends.pools.tasks import TasksPool
 from users.models import User
 from .models import Tasks, Files
-from .serializers import TasksSerializer, FileSerializer
+from .serializers import TasksSerializer
 
 
 class TasksList(generics.ListCreateAPIView):
@@ -15,7 +16,8 @@ class TasksList(generics.ListCreateAPIView):
     name = 'task-list'
 
     def get_queryset(self):
-        return Tasks.objects.filter(deleted=False)
+        backend = TasksPool.get('tasks')
+        return backend.get_existents_tasks()
 
     def get_serializer(self, *args, **kwargs):
         try:
@@ -25,25 +27,40 @@ class TasksList(generics.ListCreateAPIView):
         return super(TasksList, self).get_serializer(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        tasks = Tasks.objects.create(
-            description=request.data['description'],
-            name=request.data['name'],
-            priority=request.data['priority'],
-            owner=User.objects.get(pk=request.data['owner']),
-            deleted=False,
-        )
+        backend = QuerySetsPool.get('querysets')
+        user = backend.get_or_404(User, 'pk', request.data.get('owner'))
 
-        for file in request.data['files'][0].items():
-            if file[0] == 'id':
-                file = Files.objects.get(pk=file[1])
-            else:
-                file = Files.objects.create(url=file[1])
+        tasks = {
+            'description': request.data.get('description'),
+            'name': request.data.get('name'),
+            'priority': request.data.get('priority'),
+            'owner': user.pk,
+            'deleted': False,
+        }
 
-            tasks.files.add(file)
+        serializer = TasksSerializer(data=tasks)
 
-        tasks.save()
+        if serializer.is_valid():
+            tasks['owner'] = user
+            tasks = backend.create_resource(Tasks, **tasks)
 
-        return Response(status=201)
+            for file in request.data['files'][0].items():
+                if file[0] == 'id':
+                    file = backend.get_or_404(
+                        Model=Files,
+                        key='pk',
+                        value=file[1]
+                    )
+                else:
+                    file = backend.create_resource(Files, **{"url": file[1]})
+
+                tasks.files.add(file)
+
+            tasks.save()
+
+            return Response(status=201)
+        else:
+            return Response(data=serializer.errors, status=400)
 
 
 class TasksDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -54,7 +71,6 @@ class TasksDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.deleted = True
-        instance.save()
+        backend = TasksPool.get('tasks')
 
-        return Response(status=204)
+        return backend.delete(instance)

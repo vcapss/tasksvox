@@ -136,4 +136,13 @@ REST_FRAMEWORK = {
     )
 }
 
+POOL_OF_RAMOS = {
+    'querysets': [
+        'backends.extensions.querysets.QuerySetsBackend',
+    ],
+    'tasks': [
+        'backends.extensions.tasks.TasksBackend',
+    ]
+}
+
 STATIC_URL = '/static/'

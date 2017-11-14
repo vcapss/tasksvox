@@ -25,7 +25,7 @@ SECRET_KEY = 'cqra_+orgrc8nj@%!z@q79z)33^%r1e*2swh+yl9e=$0&fp!!r'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -38,13 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 1 º party apps
+    # 1 party apps
     'tasks',
     'tasksvx',
     'users',
 
-    # 3 º party apps
-    'rest_framework'
+    # 3 party apps
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth'
 ]
 
 MIDDLEWARE = [
@@ -122,5 +124,16 @@ USE_L10N = True
 USE_TZ = True
 
 AUTH_USER_MODEL = 'users.User'
+
+ACCOUNT_LOGOUT_ON_GET = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
 
 STATIC_URL = '/static/'

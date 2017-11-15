@@ -158,11 +158,10 @@ PUT - http://127.0.0.1:8000/tasks/{id}
 DELETE - http://127.0.0.1:8000/tasks/{id}
 
 Para atribuir a tarefa ao usuário que fez (O usuário que finalizou é automaticamente atribuido, pelo seu token de acesso):
-
 http://127.0.0.1:8000/tasks/52/finish/
 
 ```json
-{"done": "true" // "false"}
+{"done": "true"} {"done": "false"}
 ```
 
    

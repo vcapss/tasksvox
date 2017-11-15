@@ -3,7 +3,7 @@ from ramos.mixins import ThreadSafeCreateMixin
 from backends.external_resources import ExternalInterface
 
 
-class QuerySetsBackend(ThreadSafeCreateMixin, ExternalInterface):
+class ExternalsBackend(ThreadSafeCreateMixin, ExternalInterface):
     id = 'external'
 
     def get_file_from_bucket(self, file):

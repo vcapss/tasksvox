@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 PRIORITY_LEVEL = (
     (1, 1),
     (2, 2),
@@ -28,6 +30,8 @@ class Tasks(models.Model):
         on_delete=models.CASCADE
     )
     deleted = models.BooleanField(default=False, null=False)
+    done = models.BooleanField(default=False, null=False)
+    user_task_owner = models.OneToOneField(User, null=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

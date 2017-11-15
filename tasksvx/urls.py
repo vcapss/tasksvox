@@ -15,4 +15,9 @@ urlpatterns = [
         views.TasksDetail.as_view(),
         name=views.TasksDetail.name
     ),
+    url(
+        r'^tasks/(?P<pk>[0-9]+)/finish/$',
+        views.TasksDone.as_view(),
+        name=views.TasksDetail.name
+    ),
 ]

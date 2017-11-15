@@ -1,12 +1,38 @@
 from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from backends.pools.querysets import QuerySetsPool
 from backends.pools.tasks import TasksPool
 from users.models import User
 from .models import Tasks, Files
-from .serializers import TasksSerializer
+from .serializers import TasksSerializer, TasksStatusSerializer
+
+
+class TasksDone(APIView):
+    authentication_classes = (TokenAuthentication,)
+    queryset = Tasks.objects.all()
+    serializer_class = TasksSerializer
+    name = 'task-done'
+
+    def post(self, request, pk):
+        serializer = TasksStatusSerializer(data=request.data)
+
+        if serializer.is_valid():
+            backend = QuerySetsPool.get('querysets')
+            task = backend.get_or_404(Tasks, 'pk', pk)
+
+            task.done = serializer.data['done']
+            task.user_task_owner = backend.get_or_404(
+                User,
+                'pk',
+                self.request.user.pk
+            )
+            task.save()
+            return Response(status=204)
+
+        return Response(serializer.errors, status=400)
 
 
 class TasksList(generics.ListCreateAPIView):

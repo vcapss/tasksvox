@@ -12,8 +12,15 @@ class FileSerializer(serializers.ModelSerializer):
 
 
 class TasksSerializer(serializers.ModelSerializer):
-    files = FileSerializer(read_only=True, many=True)
+    files = FileSerializer(required=False, many=True)
 
     class Meta:
         model = Tasks
-        fields = ('id', 'name', 'description', 'priority', 'owner', 'files', 'created',)
+        fields = ('id', 'name', 'description', 'priority', 'owner', 'files', 'created', 'done', 'user_task_owner',)
+
+
+class TasksStatusSerializer(serializers.Serializer):
+    done = serializers.BooleanField(required=True)
+
+    class Meta:
+        fields = ('done',)

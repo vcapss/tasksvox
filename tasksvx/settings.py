@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     # 3 party apps
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth'
+    'rest_auth',
+    'rest_framework_swagger',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -133,7 +135,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 
 POOL_OF_RAMOS = {

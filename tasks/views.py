@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_filters import rest_framework as filters
 
 from backends.pools.querysets import QuerySetsPool
 from backends.pools.tasks import TasksPool
@@ -40,6 +41,8 @@ class TasksList(generics.ListCreateAPIView):
     queryset = Tasks.objects.all()
     serializer_class = TasksSerializer
     name = 'task-list'
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = '__all__'
 
     def get_queryset(self):
         backend = TasksPool.get('tasks')

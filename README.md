@@ -10,7 +10,7 @@
 
 2. Instale as dependências do Python:
     ```sh
-    pip install -r requirements.txt
+    make install
     ```
 
 3. Ative a virtualenv:
@@ -157,8 +157,8 @@ POST - http://127.0.0.1:8000/tasks/
 PUT - http://127.0.0.1:8000/tasks/{id}
 DELETE - http://127.0.0.1:8000/tasks/{id}
 
-Para atribuir a tarefa ao usuário que fez (O usuário que finalizou é automaticamente atribuido, pelo seu token de acesso):
-http://127.0.0.1:8000/tasks/52/finish/
+Para atribuir a tarefa ao usuário que fez (O usuário que pega a tarefa é automaticamente atribuido, pelo seu token de acesso):
+http://127.0.0.1:8000/tasks/52/status/
 
 ```json
 {"done": "true"} {"done": "false"}
